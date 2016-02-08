@@ -2,6 +2,8 @@ Tasks = new Mongo.Collection("tasks");
 
 if (Meteor.isClient) {
   // This code only runs on the client
+ 
+  Meteor.subscribe("tasks");
 
   Template.body.events({
     "submit .new-task": function (event) {
@@ -46,6 +48,13 @@ if (Meteor.isClient) {
 
   });
 
+  // 11.5  Define helper to check ownership
+  Template.task.helpers({
+    isOwner: function () {
+      return this.owner === Meteor.userId();
+    }
+  });
+
   Template.task.events({
     "click .toggle-checked": function () {
       // Set the checked property to the opposite of its current value
@@ -53,6 +62,10 @@ if (Meteor.isClient) {
     },
     "click .delete": function () {
       Meteor.call("deleteTask", this._id);
+    },
+    // 11.7  Add event handler to call the setPrivate method
+    "click .toggle-private": function () {
+      Meteor.call("setPrivate", this._id, ! this.private);
     }
   });
 
@@ -77,15 +90,44 @@ Meteor.methods({
     });
   },
   deleteTask: function (taskId) {
-    Tasks.remove(taskId);
+    var task = Tasks.findOne(taskId);
+    if (task.owner !== Meteor.userId()) {
+      // make sure only the owner can delete it
+      throw new Meteor.Error("not-authorized");
+    }
   },
   setChecked: function (taskId, setChecked) {
-    Tasks.update(taskId, { $set: { checked: setChecked} });
+    var task = Tasks.findOne(taskId);
+    if (task.owner !== Meteor.userId()) {
+      // make sure only the owner can check it off
+      throw new Meteor.Error("not-authorized");
+    }
+  },
+
+  // 11.6  Define method to set tasks to private
+  setPrivate: function (taskId, setToPrivate) {
+    var task = Tasks.findOne(taskId);
+  
+    // Make sure only the task owner can make a task private
+    if (task.owner !== Meteor.userId()) {
+      throw new Meteor.Error("not-authorized");
+    }
+  
+    Tasks.update(taskId, { $set: { private: setToPrivate } });
   }
+
 });
 
 if (Meteor.isServer) {
-  Meteor.startup(function () {
-    // code to run on server at startup
+  // This code only runs on the server
+
+  // Only publish tasks that are public or belong to the current user
+  Meteor.publish("tasks", function () {
+    return Tasks.find({
+      $or: [
+        { private: {$ne: true} },
+        { owner: this.userId }
+      ]
+    });
   });
 }
