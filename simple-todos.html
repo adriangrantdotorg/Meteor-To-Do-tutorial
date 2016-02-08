@@ -31,6 +31,9 @@
 </body>
  
 <template name="task">
+	{{ > videobackground vbgOptions }}
+
+	
   <li class="{{#if checked}}checked{{/if}} {{#if private}}private{{/if}}">
     <button class="delete">&times;</button>
   
