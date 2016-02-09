@@ -11,6 +11,6 @@ Open Sourced To-Do [Meteor](https://www.meteor.com) application. Featuring:
 ![logo](http://i.imgur.com/Qbv4obR.png?1 "Screenshot")
 
 ##Live Demo
-http://zen-to-do.meteor.com/(http://zen-to-do.meteor.com/)
+[http://zen-to-do.meteor.com](http://zen-to-do.meteor.com/)
 
 Have fun! 
