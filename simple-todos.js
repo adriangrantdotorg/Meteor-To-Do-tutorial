@@ -44,7 +44,14 @@ if (Meteor.isClient) {
 
       incompleteCount: function () {
         return Tasks.find({checked: {$ne: true}}).count();
-      }
+      },
+      vbgOptions () { return {
+        id: '8969176', // for https://vimeo.com/channels/staffpicks/140850530
+        type: 'vimeo',
+        loop: 100,
+        poster: '/img/clouds.jpg', // An image inside your public folder
+        aspectRatio: 1.8,
+      }}
 
   });
 
@@ -52,14 +59,7 @@ if (Meteor.isClient) {
   Template.task.helpers({
     isOwner: function () {
       return this.owner === Meteor.userId();
-    },
-    vbgOptions () { return {
-      id: '8969176', // for https://vimeo.com/channels/staffpicks/140850530
-      type: 'vimeo',
-      loop: 100,
-      poster: '/img/clouds.jpg', // An image inside your public folder
-      aspectRatio: 1.8,
-    }}
+    }
   });
 
   Template.task.events({
